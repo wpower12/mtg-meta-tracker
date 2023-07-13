@@ -8,6 +8,7 @@ TABLES = [
       `iddeck` varchar(32) NOT NULL,
       `desc` mediumtext,
       `color` varchar(5) NOT NULL,
+      `commander` varchar(45) NOT NULL, 
       PRIMARY KEY (`iddeck`)
     );""",
     """CREATE TABLE `game` (
