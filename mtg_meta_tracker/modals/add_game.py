@@ -39,6 +39,7 @@ class AddGame(discord.ui.Modal, title='Add Game'):
                 print(p, d, win)
                 cur.execute(sql_try_insert_player, {'player': p})
                 cur.execute(sql_insert_game_played, (g_id, p, d, win))
+            self.db.commit()
         except Exception as e:
             raise e
 

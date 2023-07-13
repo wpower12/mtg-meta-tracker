@@ -46,6 +46,7 @@ class AddDeck(discord.ui.Modal, title='Add Deck'):
         cur = self.db.cursor()
         try:
             cur.execute(sql_insert_deck, (self.deck_id.value, self.colors.value, self.comm.value, self.desc.value))
+            self.db.commit()
         except Exception as e:
             raise e
 
