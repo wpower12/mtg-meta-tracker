@@ -1,8 +1,8 @@
 sql_insert_deck = """
 INSERT INTO `mtg_meta_tracker`.`deck`
-(`iddeck`, `color`, `desc`)
+(`iddeck`, `color`, `commander`, `desc`)
 VALUES
-(%s, %s, %s)
+(%s, %s, %s, %s)
 """
 
 sql_try_insert_player = """

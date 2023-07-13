@@ -16,6 +16,13 @@ class AddDeck(discord.ui.Modal, title='Add Deck'):
         required=True,
     )
 
+    comm = discord.ui.TextInput(
+        label='Commander',
+        style=discord.TextStyle.short,
+        placeholder="",
+        required=True,
+    )
+
     desc = discord.ui.TextInput(
         label="Description",
         style=discord.TextStyle.long,
@@ -38,7 +45,7 @@ class AddDeck(discord.ui.Modal, title='Add Deck'):
     async def on_submit(self, interaction: discord.Interaction):
         cur = self.db.cursor()
         try:
-            cur.execute(sql_insert_deck, (self.deck_id.value, self.colors.value, self.desc.value))
+            cur.execute(sql_insert_deck, (self.deck_id.value, self.colors.value, self.comm.value, self.desc.value))
         except Exception as e:
             raise e
 
