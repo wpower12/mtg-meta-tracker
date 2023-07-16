@@ -33,6 +33,7 @@ class MTTClient(discord.Client):
             for n, name in deck_list:
                 card = scrython.cards.Named(fuzzy=name)
 
+                # TODO - Do this in literally any other way.
                 try:
                     power = card.power()
                     tough = card.toughness()
@@ -85,10 +86,4 @@ class MTTClient(discord.Client):
                 time.sleep(0.1)
 
             self.cnx.commit()
-
-# 1 Auntie Blyth, Bad Influence
-# 1 Bard Class
-
-
-
 
