@@ -17,15 +17,15 @@ class AddCards(discord.ui.Modal, title='Add Deck'):
         required=True,
     )
 
-    def __init__(self, cnx):
+    def __init__(self):
         super().__init__(timeout=None)
-        self.db = cnx
 
     async def on_submit(self, interaction: discord.Interaction):
         card_list = []
         for line in self.cards.value.split('\n'):
             n, name = line.split(" ", 1)
             card_list.append((n, name))
+
         # We send the slightly-processed card list to the client, where a background task will
         # actually pull data from scryfall and add card data to the db and link it to a deck.
         interaction.client.deck_lists.append((self.deck_id.value, card_list))

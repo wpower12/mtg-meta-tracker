@@ -1,7 +1,9 @@
 import discord
 
 from mtg_meta_tracker.app import MTTClient
-from mtg_meta_tracker.modals import AddGame, AddDeck, AddCards
+# from mtg_meta_tracker.modals import AddGame, AddDeck, AddCards
+from mtg_meta_tracker.modals import AddDeck, AddCards
+from mtg_meta_tracker.views import AddGameMsg
 from mtg_meta_tracker.embeds import LBDeckEmbed, DeckSummaryEmbed, generate_card_list_embeds
 
 def run(db_cnx, discord_token):
@@ -17,7 +19,7 @@ def run(db_cnx, discord_token):
 
     @client.tree.command(description="Add cards to a deck.")
     async def add_cards(interaction: discord.Interaction):
-        await interaction.response.send_modal(AddCards(db_cnx))
+        await interaction.response.send_modal(AddCards())
 
     @client.tree.command(description="Show meta info for a given deck.")
     async def deck_summary(interaction: discord.Interaction, deck_id: str):

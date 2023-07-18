@@ -28,6 +28,11 @@ class AddGame(discord.ui.Modal, title='Add Game'):
         super().__init__()
         self.db = cnx
 
+    """
+    NOTE - I'm worried that this will also 'time out' the modal, especially if cnx is going out to a remote server.
+           I think the 'safest' thing to do will be to have all the DB stuff happen in scheduled background tasks.
+           This would, similar to the decklist, get added to a queue that will be processed elsewhere. 
+    """
     async def on_submit(self, interaction: discord.Interaction):
         cur = self.db.cursor()
         try:
@@ -47,10 +52,3 @@ class AddGame(discord.ui.Modal, title='Add Game'):
 
     async def on_error(self, interaction: discord.Interaction, error: Exception) -> None:
         await interaction.response.send_message(f'Oops! Something went wrong.\n{error}', ephemeral=True)
-
-"""
-Powpowpow, AUNTIE
-Dr. Nicky, DARKELVES
-Chucky, URZA_ARTS
-Paul, WHITE_RABBIT
-"""

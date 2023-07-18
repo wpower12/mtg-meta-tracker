@@ -31,15 +31,11 @@ class DeckSummaryEmbed(discord.Embed):
         self.add_field(name=f"{color_str} - {comm}", value=f"{wins} {win_str}\n{desc}")
 
         card = scrython.cards.Named(fuzzy=comm)
-        for k in card.image_uris():
-            print(k)
-        # print(card.image_uris())
         self.set_thumbnail(url=card.image_uris()['art_crop'])
 
 class DeckCardsEmbed(discord.Embed):
     def __init__(self, title, card_data):
         super(DeckCardsEmbed, self).__init__(title=title)
-        print(card_data)
         table = t2a(
             body=card_data,
             style=PresetStyle.plain
