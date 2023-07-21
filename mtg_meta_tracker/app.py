@@ -42,4 +42,5 @@ class MTTClient(discord.Client):
                     except Exception as e:
                         print(f"error adding {name}")
                         print(e)
-            self.cnx.commit()
+
+                self.cnx.commit()

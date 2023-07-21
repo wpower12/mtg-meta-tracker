@@ -2,6 +2,7 @@ from discord.utils import get
 
 def colors_to_str_rep(colors, emojis):
     color_rep = ""
+    print(colors)
 
     for c in colors:
         if c not in "{}":

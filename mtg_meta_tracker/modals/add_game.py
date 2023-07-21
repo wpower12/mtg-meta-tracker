@@ -34,19 +34,21 @@ class AddGame(discord.ui.Modal, title='Add Game'):
            This would, similar to the decklist, get added to a queue that will be processed elsewhere. 
     """
     async def on_submit(self, interaction: discord.Interaction):
-        cur = self.db.cursor()
-        try:
-            cur.execute(sql_insert_game, (self.date.value, self.notes.value))
-            g_id = cur.lastrowid
-            for i, line in enumerate(self.players.value.split("\n")):
-                p, d = line.split(", ")
-                win = 1 if i == 0 else 0
-                print(p, d, win)
-                cur.execute(sql_try_insert_player, {'player': p})
-                cur.execute(sql_insert_game_played, (g_id, p, d, win))
-            self.db.commit()
-        except Exception as e:
-            raise e
+        with self.db.cursor() as cur:
+            try:
+                cur.execute(sql_insert_game, (self.date.value, self.notes.value))
+
+                g_id = cur.lastrowid
+                for i, line in enumerate(self.players.value.split("\n")):
+                    p, d = line.split(", ")
+                    win = 1 if i == 0 else 0
+                    print(p, d, win)
+                    cur.execute(sql_try_insert_player, {'player': p})
+                    cur.execute(sql_insert_game_played, (g_id, p, d, win))
+                self.db.commit()
+
+            except Exception as e:
+                raise e
 
         await interaction.response.send_message(f'Added game record', ephemeral=True)
 

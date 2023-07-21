@@ -1,9 +1,7 @@
 import discord
 
 from mtg_meta_tracker.app import MTTClient
-# from mtg_meta_tracker.modals import AddGame, AddDeck, AddCards
-from mtg_meta_tracker.modals import AddDeck, AddCards
-from mtg_meta_tracker.views import AddGameMsg
+from mtg_meta_tracker.modals import AddGame, AddDeck, AddCards
 from mtg_meta_tracker.embeds import LBDeckEmbed, DeckSummaryEmbed, generate_card_list_embeds
 
 def run(db_cnx, discord_token):
@@ -29,7 +27,10 @@ def run(db_cnx, discord_token):
     @client.tree.command(description="Show cards for a given deck.")
     async def deck_cards(interaction: discord.Interaction, deck_id: str):
         card_embeds = generate_card_list_embeds(db_cnx, client.emojis, deck_id)
-        await interaction.response.send_message(embeds=card_embeds)
+        if len(card_embeds) == 0:
+            await interaction.response.send_message(content="No cards in deck!")
+        else:
+            await interaction.response.send_message(embeds=card_embeds)
 
     @client.tree.command(description="Show the current leaderboard, by deck.")
     async def deck_lb(interaction: discord.Interaction):

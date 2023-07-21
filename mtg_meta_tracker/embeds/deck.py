@@ -10,28 +10,34 @@ class DeckSummaryEmbed(discord.Embed):
     def __init__(self, title, cnx, emojis, deck_id):
         super(DeckSummaryEmbed, self).__init__(title=title)
 
-        cur = cnx.cursor()
-        cur.execute(sql_get_deck, (deck_id,))
-        deck_meta = cur.fetchone()
-        comm, color_identity, desc = deck_meta
+        found_deck = False
+        with cnx.cursor() as cur:
+            try:
+                cur.execute(sql_get_deck, (deck_id,))
+                deck_meta = cur.fetchone()
 
-        cur.execute(sql_get_wins, (deck_id,))
-        wins = cur.fetchone()
-        if wins is None:
-            wins = 0
+                if deck_meta is not None:
+                    found_deck = True
+                    comm, color_identity, desc = deck_meta
+                    cur.execute(sql_get_wins, (deck_id,))
+                    wins = cur.fetchone()
+
+            except Exception as e:
+                print("error in deck summary query.")
+                print(f"error: {e}")
+
+        if found_deck:
+            wins = 0 if wins is None else wins[0]
+            win_str = "win" if wins == 1 else "wins"
+
+            color_str = colors_to_str_rep(color_identity, emojis)
+            self.add_field(name=f"{color_str} - {comm}", value=f"{wins} {win_str}\n{desc}")
+            card = scrython.cards.Named(fuzzy=comm)
+            self.set_thumbnail(url=card.image_uris()['art_crop'])
+
         else:
-            wins = wins[0]
+            self.add_field(name=f"Error retrieving deck.", value=f"Deck ID {deck_id} not found.")
 
-        if wins == 1:
-            win_str = "win"
-        else:
-            win_str = "wins"
-
-        color_str = colors_to_str_rep(color_identity, emojis)
-        self.add_field(name=f"{color_str} - {comm}", value=f"{wins} {win_str}\n{desc}")
-
-        card = scrython.cards.Named(fuzzy=comm)
-        self.set_thumbnail(url=card.image_uris()['art_crop'])
 
 class DeckCardsEmbed(discord.Embed):
     def __init__(self, title, card_data):
@@ -45,15 +51,22 @@ class DeckCardsEmbed(discord.Embed):
 
 def generate_card_list_embeds(cnx, emojis, deck_id):
     cards_per_embed = 25
-    cur = cnx.cursor()
-    cur.execute(sql_get_deck_cards, (deck_id,))
-    card_table_data = []
-    for card in cur.fetchall():
-        count, name, mana_cost, type_line, sf_uri = card
-        card_table_data.append(
-            # [count, f"[{name}]({sf_uri})"]
-            [count, f"{name}"]
-        )
+    with cnx.cursor(buffered=True) as cur:
+        try:
+            cur.execute(sql_get_deck_cards, (deck_id,))
+            if cur.rowcount == 0:
+                return []
+
+            card_table_data = []
+            for card in cur.fetchall():
+                count, name, mana_cost, type_line, sf_uri = card
+                card_table_data.append(
+                    # [count, f"[{name}]({sf_uri})"]  # Takes up too many characters.
+                    [count, f"{name}"]
+                )
+        except Exception as e:
+            print("error in card retirevial sql")
+            print(f"error: {e}")
 
     embeds = []
     if len(card_table_data) > cards_per_embed:
@@ -63,4 +76,5 @@ def generate_card_list_embeds(cnx, emojis, deck_id):
             embeds.append(DeckCardsEmbed("Cards", partial_list))
     else:
         embeds.append(DeckCardsEmbed("Cards", card_table_data))
+
     return embeds
