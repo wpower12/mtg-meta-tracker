@@ -1,3 +1,6 @@
 mysql-connector-python
 scrython
 table2ascii
+python-decouple
+discord.py
+nest-asyncio
