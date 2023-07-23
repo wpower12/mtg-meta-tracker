@@ -1,0 +1,38 @@
+# To Make/Do
+- [ ] Better command/interface for adding a deck. 
+  - Similar to spelltable bots interface/mess-with-buttons for making and joining a game.
+- [ ] Commands for editing a deck. 
+  - Check that user/player owns the deck id. (see other todo below)
+- [ ] Associate users with decks, and make sure players in games are users in the db.
+  - Will require editing old decks to include usernames for their owners
+  - Want to restrict deck adds/deck-use-in-game to just the user calling commands.
+  - Want to only allow the owner of a deck to make changes to a deck, etc...
+  - [ ] Change add-deck logic to also add the current player/user as owner
+  - [ ] Update database to include fields/links for deck ownership.
+  - [ ] Change add-player-deck-to-game logic to check that the player owns that deck?
+- [ ] Better command interface
+  - Currently, a lot of the commands could have information passed as parameters to the slash command, and not be needed in the modal/view.
+  - Also, many of the commands could be grouped, and have subcommands. Like the 'add' commands
+  - Could be something like '/add deck DECK_ID' vs '/add deck cards DECK_ID' vs. '/add game'
+  - Would clean up the output of the slash interface/helper menu that pops up. 
+- [X] Setup guide
+  - First draft, at least. 
+- [ ] Command documentation
+  - In the repo
+  - In the commands themselves via the slash command menu interface
+
+# To Figure Out
+- [ ] How to use git like an adult. 
+- [x] Do we directly associate decks with users? Right now they're indirectly associated by virtue of being used as part of a composite key for the games_played table.
+- [x] Should we explicitly create users? 
+  - How do you allow a user/player to modify their own meta? own decks?
+  - I think we assume the player for any given interaction or deck add/edit is the user calling the command. 
+  - Means going back and associating user names with decks, and making sure they match the existing usernames for games. 
+- [ ] What meta-data to associate with everything?
+- [ ] How to link decks? 
+  - Just a link to a moxfield/something list?
+  - Actually store cards? Ingest cards from the moxfield/something list/link?
+- [X] How to display actual mana symbols?
+- [ ] Are there better GUI/CLI options/modules for adding decks/games?
+  - Would like to handle arbitrary numbers of players/decks
+  - Should eventually track a 'format' so you could do EDH, limited, pauper...?
