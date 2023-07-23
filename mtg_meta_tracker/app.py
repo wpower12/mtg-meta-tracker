@@ -17,6 +17,9 @@ class MTTClient(discord.Client):
         self.tree = app_commands.CommandTree(self)
         self.deck_lists = []
 
+    def add_deck_list_to_queue(self, dl, deck_id):
+        self.deck_lists.append([deck_id, dl])
+
     async def on_ready(self):
         print(f'Logged in as {self.user} (ID: {self.user.id})')
         print('------')

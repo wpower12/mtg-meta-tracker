@@ -28,7 +28,8 @@ class AddCards(discord.ui.Modal, title='Add Deck'):
 
         # We send the slightly-processed card list to the client, where a background task will
         # actually pull data from scryfall and add card data to the db and link it to a deck.
-        interaction.client.deck_lists.append((self.deck_id.value, card_list))
+        # interaction.client.deck_lists.append((self.deck_id.value, card_list))
+        interaction.client.add_deck_list_to_queue(card_list, self.deck_id.value)
         await interaction.response.send_message(f'Adding card list to queue for deck; {self.deck_id}.', ephemeral=True)
 
     async def on_error(self, interaction: discord.Interaction, error: Exception) -> None:
