@@ -3,9 +3,6 @@ import mtg_meta_tracker
 import sqlalchemy
 from decouple import config
 
-# cnx = mysql.connector.connect(user=config('DB_USER'),
-#                               password=config('DB_PASSWORD'),
-#                               host=config('DB_HOST'), database="mtg_meta_tracker")
 user = config('DB_USER')
 pw   = config('DB_PASSWORD')
 engine = sqlalchemy.create_engine(f"mysql+mysqlconnector://{user}:{pw}@localhost/mtg_meta_tracker")

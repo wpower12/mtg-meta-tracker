@@ -1,7 +1,5 @@
-import datetime
-# from typing import List, Optional
 from sqlalchemy import Date, Text, Table, Column, Integer, Float
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, registry
+from sqlalchemy.orm import registry
 
 mapper_registry = registry()
 
