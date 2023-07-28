@@ -1,5 +1,9 @@
 import discord
 import scrython
+
+from sqlalchemy import text
+from sqlalchemy.orm import Session
+
 from table2ascii import table2ascii as t2a, PresetStyle
 
 from ..sql import sql_get_deck, sql_get_deck_cards, sql_get_wins
@@ -7,20 +11,20 @@ from ..util import colors_to_str_rep
 
 class DeckSummaryEmbed(discord.Embed):
 
-    def __init__(self, title, cnx, emojis, deck_id):
+    def __init__(self, title, db_engine, emojis, deck_id):
         super(DeckSummaryEmbed, self).__init__(title=title)
 
         found_deck = False
-        with cnx.cursor() as cur:
+        with Session(db_engine) as session:
             try:
-                cur.execute(sql_get_deck, (deck_id,))
-                deck_meta = cur.fetchone()
+                res = session.execute(text(sql_get_deck), {'iddeck': deck_id})
+                deck_meta = res.fetchone()
 
                 if deck_meta is not None:
                     found_deck = True
                     comm, color_identity, desc = deck_meta
-                    cur.execute(sql_get_wins, (deck_id,))
-                    wins = cur.fetchone()
+                    win_res = session.execute(text(sql_get_wins), {'iddeck': deck_id})
+                    wins = win_res.fetchone()
 
             except Exception as e:
                 print("error in deck summary query.")
@@ -32,6 +36,9 @@ class DeckSummaryEmbed(discord.Embed):
 
             color_str = colors_to_str_rep(color_identity, emojis)
             self.add_field(name=f"{color_str} - {comm}", value=f"{wins} {win_str}\n{desc}")
+
+            # TODO - Keep this URI in the DB, and return it in the query above.
+            #        saves a possible fuck up with the scryfall api call.
             card = scrython.cards.Named(fuzzy=comm)
             self.set_thumbnail(url=card.image_uris()['art_crop'])
 
@@ -49,24 +56,24 @@ class DeckCardsEmbed(discord.Embed):
         self.add_field(name="Cards", value=table)
 
 
-def generate_card_list_embeds(cnx, emojis, deck_id):
+def generate_card_list_embeds(db_engine, emojis, deck_id):
     cards_per_embed = 25
-    with cnx.cursor(buffered=True) as cur:
-        try:
-            cur.execute(sql_get_deck_cards, (deck_id,))
-            if cur.rowcount == 0:
-                return []
 
-            card_table_data = []
-            for card in cur.fetchall():
+    card_table_data = []
+    with Session(db_engine) as session:
+        try:
+            res = session.execute(text(sql_get_deck_cards), {'iddeck': deck_id})
+            for card in res.fetchall():
                 count, name, mana_cost, type_line, sf_uri = card
                 card_table_data.append(
-                    # [count, f"[{name}]({sf_uri})"]  # Takes up too many characters.
                     [count, f"{name}"]
                 )
         except Exception as e:
             print("error in card retirevial sql")
             print(f"error: {e}")
+
+    if len(card_table_data) == 0:
+        return []
 
     embeds = []
     if len(card_table_data) > cards_per_embed:

@@ -4,3 +4,4 @@ table2ascii
 python-decouple
 discord.py
 nest-asyncio
+SQLAlchemy

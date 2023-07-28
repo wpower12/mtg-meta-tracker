@@ -1,4 +1,6 @@
 import discord
+from sqlalchemy import text
+from sqlalchemy.orm import Session
 from ..sql import sql_insert_deck
 
 
@@ -38,17 +40,19 @@ class AddDeck(discord.ui.Modal, title='Add Deck'):
         required=False,
     )
 
-    def __init__(self, cnx):
+    def __init__(self, db_engine):
         super().__init__()
-        self.db = cnx
+        self.engine = db_engine
 
     async def on_submit(self, interaction: discord.Interaction):
-        cur = self.db.cursor()
-        try:
-            cur.execute(sql_insert_deck, (self.deck_id.value, self.colors.value, self.comm.value, self.desc.value))
-            self.db.commit()
-        except Exception as e:
-            raise e
+        with Session(self.engine) as session, session.begin():
+            deck_data = {
+                'iddeck': self.deck_id.value,
+                'color': self.colors.value,
+                'commander': self.comm.value,
+                'desc': self.desc.value,
+            }
+            session.execute(text(sql_insert_deck), deck_data)
 
         await interaction.response.send_message(f'Added Deck; {self.deck_id}', ephemeral=True)
 

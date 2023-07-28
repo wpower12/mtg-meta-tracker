@@ -1,5 +1,8 @@
 import discord
-from ..sql import sql_try_insert_player, sql_insert_game, sql_insert_game_played
+from sqlalchemy import text, insert
+from sqlalchemy.orm import Session
+from ..sql import sql_try_insert_player, sql_insert_game_played
+from ..models import Game, game_table
 
 class AddGame(discord.ui.Modal, title='Add Game'):
     date = discord.ui.TextInput(
@@ -24,9 +27,9 @@ class AddGame(discord.ui.Modal, title='Add Game'):
         max_length=300,
     )
 
-    def __init__(self, cnx):
+    def __init__(self, db_engine):
         super().__init__()
-        self.db = cnx
+        self.engine = db_engine
 
     """
     NOTE - I'm worried that this will also 'time out' the modal, especially if cnx is going out to a remote server.
@@ -34,23 +37,26 @@ class AddGame(discord.ui.Modal, title='Add Game'):
            This would, similar to the decklist, get added to a queue that will be processed elsewhere. 
     """
     async def on_submit(self, interaction: discord.Interaction):
-        with self.db.cursor() as cur:
-            try:
-                cur.execute(sql_insert_game, (self.date.value, self.notes.value))
 
-                g_id = cur.lastrowid
-                for i, line in enumerate(self.players.value.split("\n")):
+        with Session(self.engine) as session, session.begin():
+            stmt = insert(game_table)
+            res = session.execute(stmt, {'date': self.date.value, 'notes': self.notes.value})
+
+            g_id = res.inserted_primary_key[0]
+            for i, line in enumerate(self.players.value.split("\n")):
                     p, d = line.split(", ")
                     win = 1 if i == 0 else 0
                     print(p, d, win)
-                    cur.execute(sql_try_insert_player, {'player': p})
-                    cur.execute(sql_insert_game_played, (g_id, p, d, win))
-                self.db.commit()
 
-            except Exception as e:
-                raise e
+                    session.execute(text(sql_try_insert_player), {'idplayer': p})
+                    session.execute(text(sql_insert_game_played), {
+                        'idgame': g_id,
+                        'idplayer': p,
+                        'iddeck': d,
+                        'winner': win
+                    })
 
         await interaction.response.send_message(f'Added game record', ephemeral=True)
 
     async def on_error(self, interaction: discord.Interaction, error: Exception) -> None:
-        await interaction.response.send_message(f'Oops! Something went wrong.\n{error}', ephemeral=True)
+        await interaction.response.send_message(f'Error adding game.\n{error}', ephemeral=True)

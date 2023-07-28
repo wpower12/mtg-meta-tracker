@@ -2,8 +2,6 @@ from discord.utils import get
 
 def colors_to_str_rep(colors, emojis):
     color_rep = ""
-    print(colors)
-
     for c in colors:
         if c not in "{}":
             mana_em_name = f"mana{c.lower()}"
@@ -20,12 +18,10 @@ def maybe_field(field, obj):
 def maybe_float(val):
     if val is None:
         return None
-
     try:
         num = float(val)
     except ValueError:
         num = None
-
     return num
 
 """
@@ -34,8 +30,7 @@ Handles the nulling, too.
 Just the stuff I'm saving, for now. 
 """
 def parse_scryfalljson(card):
-    # Stuff from the 'whole card' - Needs to be grabbed before possibly
-    # swapping to the primary face.
+    # Stuff from the 'whole card' - Needs to be grabbed before possibly swapping to the primary face.
     oracle_id    = card['oracle_id']
     scryfall_uri = card['scryfall_uri']
     color_id_str = "".join(card['color_identity'])
@@ -50,16 +45,16 @@ def parse_scryfalljson(card):
     tough   = maybe_field('toughness', card)
     num_tou = maybe_float(power)
 
-    return [oracle_id,
-            scryfall_uri,
-            cmc,
-            color_id_str,
-            maybe_field('loyalty', card),
-            maybe_field('mana+cost', card),
-            card['name'],
-            card['oracle_text'],
-            power,
-            num_pow,
-            tough,
-            num_tou,
-            card['type_line']]
+    return {"oracle_id": oracle_id,
+            "scryfall_uri": scryfall_uri,
+            "cmc": cmc,
+            "color_identity": color_id_str,
+            "loyalty": maybe_field('loyalty', card),
+            "mana_cost": maybe_field('mana_cost', card),
+            "name": card['name'],
+            "oracle_text": card['oracle_text'],
+            "power": power,
+            "power_numeric": num_pow,
+            "toughness": tough,
+            "toughness_numeric": num_tou,
+            "typeline": card['type_line']}
