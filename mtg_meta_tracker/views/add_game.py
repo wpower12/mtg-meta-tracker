@@ -97,10 +97,10 @@ class AddGameMsg(discord.ui.View):
 
     async def submit_record(self, interaction: discord.Interaction):
         await interaction.response.defer()
+
         for btn in self.buttons:
-            btn.disabled = True
-        self.sub_button.disabled = True
-        self.sub_button.style = discord.ButtonStyle.grey
+            self.remove_item(btn)
+        self.remove_item(self.sub_button)
 
         with Session(self.db) as session, session.begin():
             stmt = insert(game_table)
