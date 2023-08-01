@@ -1,7 +1,7 @@
 import discord
 from sqlalchemy import text
 from sqlalchemy.orm import Session
-from ..sql import sql_insert_deck
+from ..sql import sql_insert_deck, sql_try_insert_player
 
 
 class AddDeck(discord.ui.Modal, title='Add Deck'):
@@ -51,7 +51,9 @@ class AddDeck(discord.ui.Modal, title='Add Deck'):
                 'color': self.colors.value,
                 'commander': self.comm.value,
                 'desc': self.desc.value,
+                'creator': interaction.user.display_name
             }
+            session.execute(text(sql_try_insert_player), {'idplayer': interaction.user.display_name})
             session.execute(text(sql_insert_deck), deck_data)
 
         await interaction.response.send_message(f'Added Deck; {self.deck_id}', ephemeral=True)
