@@ -2,14 +2,17 @@ import discord
 
 from mtg_meta_tracker.app import MTTClient
 from mtg_meta_tracker.modals import AddGame, AddDeck, AddCards
-from mtg_meta_tracker.embeds import LBDeckEmbed, DeckSummaryEmbed, generate_card_list_embeds
+from mtg_meta_tracker.embeds import LBDeckEmbed, DeckSummaryEmbed, generate_card_list_embeds, GameRecordEmbed
+
+from mtg_meta_tracker.views import AddGameMsg
 
 def run(db_engine, discord_token, bot_channel_id):
     client = MTTClient(db_engine, bot_channel_id)
 
     @client.tree.command(description="Add a game record to the meta database.")
-    async def add_game(interaction: discord.Interaction):
-        await interaction.response.send_modal(AddGame(db_engine))
+    async def add_game(interaction: discord.Interaction, seats: int, date: str, notes: str):
+        await interaction.response.send_message(view=AddGameMsg(db_engine, seats, date, notes, interaction),
+                                                embed=GameRecordEmbed([], date, notes))
 
     @client.tree.command(description="Add a deck to the database.")
     async def add_deck(interaction: discord.Interaction):

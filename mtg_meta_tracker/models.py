@@ -11,6 +11,22 @@ game_table = Table(
     Column("notes", Text)
 )
 
+player_table = Table(
+    "player",
+    mapper_registry.metadata,
+    Column("idplayer", Text, primary_key=True)
+)
+
+deck_table = Table(
+    "deck",
+    mapper_registry.metadata,
+    Column("iddeck", Text, primary_key=True),
+    Column("desc", Text),
+    Column("color", Text),
+    Column("commander", Text),
+    Column("creator", Text)
+)
+
 card_table = Table(
     "card",
     mapper_registry.metadata,
@@ -38,6 +54,15 @@ class Game:
 class Card:
     pass
 
+class Deck:
+    pass
+
+class Player:
+    pass
+
 
 mapper_registry.map_imperatively(Game, game_table)
 mapper_registry.map_imperatively(Card, card_table)
+mapper_registry.map_imperatively(Deck, deck_table)
+mapper_registry.map_imperatively(Player, player_table)
+

@@ -1,5 +1,4 @@
 import mtg_meta_tracker
-# import mysql.connector
 import sqlalchemy
 from decouple import config
 

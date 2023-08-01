@@ -69,3 +69,7 @@ INSERT IGNORE INTO `mtg_meta_tracker`.`cards`
 VALUES
 (:oracle_id, :iddeck, :count);
 """
+
+sql_get_players = """SELECT idplayer FROM mtg_meta_tracker.player;"""
+
+sql_get_decks = """SELECT iddeck FROM mtg_meta_tracker.deck;"""
