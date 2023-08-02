@@ -61,7 +61,8 @@ class DynButton(discord.ui.Button):
         self.n = n
 
     async def callback(self, interaction: discord.Interaction):
-        await interaction.response.send_message(view=AddPlayerMsg(self.parent.db, self.n, self.parent))
+        await interaction.response.send_message(view=AddPlayerMsg(self.parent.db, self.n, self.parent),
+                                                ephemeral=True)
 
 
 PLACE_STRS = ["1st", "2nd", "3rd", "4th"]
