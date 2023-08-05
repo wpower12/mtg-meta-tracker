@@ -24,8 +24,8 @@ class MTTClient(discord.Client):
         self.tree = app_commands.CommandTree(self)
         self.deck_lists = []
 
-    def add_deck_list_to_queue(self, dl, deck_id):
-        self.deck_lists.append([deck_id, dl])
+    def add_deck_list_to_queue(self, dl, deck_id, user):
+        self.deck_lists.append([deck_id, dl, user])
 
     async def on_ready(self):
         print(f'Logged in as {self.user} (ID: {self.user.id})')
@@ -38,7 +38,7 @@ class MTTClient(discord.Client):
     async def add_available_deck_lists(self):
         if len(self.deck_lists) > 0:
             err_cards, success_cards = [], []
-            deck_id, deck_list = self.deck_lists.pop()
+            deck_id, deck_list, user = self.deck_lists.pop()
             for n, name in deck_list:
                 with Session(self.engine) as session, session.begin():
                     try:
@@ -57,11 +57,14 @@ class MTTClient(discord.Client):
                         print(e)
                         err_cards.append(name)
 
-            # if len(success_cards) > 0:
-            #     suc_cards_str = "\n".join(success_cards)
-            #     channel = self.get_channel(self.channel_id)
-            #     await channel.send(content=f"Successfully added cards to {deck_id}:\n{suc_cards_str}")
-            # if len(err_cards) > 0:
-            #     err_cards_str = "\n".join(err_cards)
-            #     channel = self.get_channel(self.channel_id)
-            #     await channel.send(content=f"Error adding cards to {deck_id}:\n{err_cards_str}")
+            try:
+                user_obj = await self.fetch_user(user)
+                if len(success_cards) > 0:
+                    suc_cards_str = "\n".join(success_cards)
+                    await user_obj.send(content=f"Successfully added cards to {deck_id}:\n{suc_cards_str}")
+                if len(err_cards) > 0:
+                    err_cards_str = "\n".join(err_cards)
+                    await user_obj.send(content=f"Error adding cards to {deck_id}:\n{err_cards_str}")
+            except Exception as e:
+                print(f"Error fetching user {user}, {e}")
+
