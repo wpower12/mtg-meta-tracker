@@ -1,9 +1,8 @@
 import discord
 
 from mtg_meta_tracker.app import MTTClient
-from mtg_meta_tracker.modals import AddGame, AddDeck, AddCards
+from mtg_meta_tracker.modals import AddDeck, AddCards
 from mtg_meta_tracker.embeds import LBDeckEmbed, DeckSummaryEmbed, generate_card_list_embeds, GameRecordEmbed
-
 from mtg_meta_tracker.views import AddGameMsg
 
 def run(db_engine, discord_token, bot_channel_id):
