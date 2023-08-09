@@ -2,7 +2,8 @@ import discord
 
 from mtg_meta_tracker.app import MTTClient
 from mtg_meta_tracker.modals import AddDeck, AddCards
-from mtg_meta_tracker.embeds import LBDeckEmbed, LBUserEmbed, DeckSummaryEmbed, generate_card_list_embeds, GameRecordEmbed
+from mtg_meta_tracker.embeds import LBDeckEmbed, LBUserEmbed, DeckSummaryEmbed, generate_card_list_embeds, \
+    GameRecordEmbed, UserStats
 from mtg_meta_tracker.views import AddGameMsg
 
 def run(db_engine, discord_token, bot_channel_id):
@@ -42,6 +43,11 @@ def run(db_engine, discord_token, bot_channel_id):
     @client.tree.command(description="Show the current leaderboard, by user.")
     async def user_lb(interaction: discord.Interaction):
         embed = LBUserEmbed("User Leaderboard", db_engine)
+        await interaction.response.send_message(embed=embed)
+
+    @client.tree.command(description="Show a summary of a user. Their decks and win rates.")
+    async def user_stats(interaction: discord.Interaction, user_id: str):
+        embed = UserStats(user_id, db_engine)
         await interaction.response.send_message(embed=embed)
 
     client.run(discord_token)

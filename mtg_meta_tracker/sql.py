@@ -81,3 +81,19 @@ VALUES
 sql_get_players = """SELECT idplayer FROM mtg_meta_tracker.player;"""
 
 sql_get_decks = """SELECT iddeck FROM mtg_meta_tracker.deck;"""
+
+sql_get_user_summary = """
+SELECT COUNT(IF(games_played.winner=1, 1, Null)) as 'wins', COUNT(*) as 'plays' FROM player
+LEFT JOIN games_played ON games_played.idplayer=player.idplayer
+WHERE player.idplayer=:idplayer
+GROUP BY player.idplayer
+"""
+
+sql_get_user_deck_summary = """
+SELECT deck.iddeck, deck.commander, deck.desc, deck.color, COUNT(IF(gp.winner=1, 1, NULL)) as 'wins', COUNT(*) as 'plays'
+FROM player 
+JOIN deck on deck.creator=player.idplayer
+JOIN games_played as gp on gp.iddeck=deck.iddeck
+WHERE player.idplayer=:idplayer
+GROUP BY deck.iddeck, deck.desc, deck.color;
+"""
