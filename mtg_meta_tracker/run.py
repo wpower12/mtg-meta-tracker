@@ -2,12 +2,12 @@ import discord
 
 from mtg_meta_tracker.app import MTTClient
 from mtg_meta_tracker.modals import AddDeck, AddCards
-from mtg_meta_tracker.embeds import LBDeckEmbed, DeckSummaryEmbed, generate_card_list_embeds, GameRecordEmbed
+from mtg_meta_tracker.embeds import LBDeckEmbed, LBUserEmbed, DeckSummaryEmbed, generate_card_list_embeds, GameRecordEmbed
 from mtg_meta_tracker.views import AddGameMsg
 
 def run(db_engine, discord_token, bot_channel_id):
     client = MTTClient(db_engine, bot_channel_id)
-
+    
     @client.tree.command(description="Add a game record to the meta database.")
     async def add_game(interaction: discord.Interaction, seats: int, date: str, notes: str):
         await interaction.response.send_message(view=AddGameMsg(db_engine, seats, date, notes, interaction),
@@ -36,7 +36,12 @@ def run(db_engine, discord_token, bot_channel_id):
 
     @client.tree.command(description="Show the current leaderboard, by deck.")
     async def deck_lb(interaction: discord.Interaction):
-        embed = LBDeckEmbed("Deck Leaderboard", db_engine, client.emojis)
+        embed = LBDeckEmbed("Deck Leaderboard", db_engine)
+        await interaction.response.send_message(embed=embed)
+
+    @client.tree.command(description="Show the current leaderboard, by user.")
+    async def user_lb(interaction: discord.Interaction):
+        embed = LBUserEmbed("User Leaderboard", db_engine)
         await interaction.response.send_message(embed=embed)
 
     client.run(discord_token)

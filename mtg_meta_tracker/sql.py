@@ -35,6 +35,13 @@ GROUP BY deck.iddeck
 order by COUNT(*) DESC;
 """
 
+sql_user_lb = """
+SELECT player.idplayer, COUNT(*) as 'wins' FROM player
+LEFT JOIN games_played ON games_played.idplayer=player.idplayer
+WHERE games_played.winner=1
+GROUP BY player.idplayer;
+"""
+
 sql_get_deck = """
 SELECT commander, color, deck.desc FROM deck 
 WHERE deck.iddeck=:iddeck;
