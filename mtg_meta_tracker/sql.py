@@ -27,19 +27,20 @@ VALUES
 """
 
 sql_deck_lb = """
-SELECT deck.iddeck, deck.color, deck.desc, deck.commander, COUNT(*) as 'wins'
+SELECT 
+    deck.iddeck, deck.color, deck.desc, deck.commander, 
+    COUNT(IF(gp.winner=1, 1, Null)) as 'wins', COUNT(*) as 'plays'
 FROM games_played as gp
 LEFT JOIN deck on gp.iddeck = deck.iddeck
-WHERE winner=1
 GROUP BY deck.iddeck
-order by COUNT(*) DESC;
+order by COUNT(IF(gp.winner=1, 1, Null)) DESC;
 """
 
 sql_user_lb = """
-SELECT player.idplayer, COUNT(*) as 'wins' FROM player
+SELECT player.idplayer, COUNT(IF(games_played.winner=1, 1, Null)) as 'wins', COUNT(*) as 'plays' FROM player
 LEFT JOIN games_played ON games_played.idplayer=player.idplayer
-WHERE games_played.winner=1
-GROUP BY player.idplayer;
+GROUP BY player.idplayer
+order by COUNT(IF(games_played.winner=1, 1, Null)) DESC;
 """
 
 sql_get_deck = """

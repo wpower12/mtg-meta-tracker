@@ -14,12 +14,12 @@ class LBDeckEmbed(discord.Embed):
             res = session.execute(text(sql_deck_lb))
             decks = res.fetchall()
 
-        for (deck_id, color, desc, comm, wins) in decks:
+        for (deck_id, color, desc, comm, wins, plays) in decks:
             if wins == 1:
                 win_str = "win"
             else:
                 win_str = "wins"
-            self.add_field(name=f"{wins} {win_str}: {deck_id}",
+            self.add_field(name=f"{wins} {win_str}, {plays} plays: {deck_id}",
                            value=f"{comm} - {desc}",
                            inline=False)
 
@@ -32,10 +32,10 @@ class LBUserEmbed(discord.Embed):
             res = session.execute(text(sql_user_lb))
             user_records = res.fetchall()
 
-        for (user, wins) in user_records:
+        for (user, wins, played) in user_records:
             if wins == 1:
                 win_str = "win"
             else:
                 win_str = "wins"
-            self.add_field(name="", value=f"{user} - {wins} {win_str}",
+            self.add_field(name="", value=f"{user} - {wins} {win_str}, {played} played",
                            inline=False)
