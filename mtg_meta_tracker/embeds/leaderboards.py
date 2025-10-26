@@ -1,9 +1,6 @@
 import discord
-
-from sqlalchemy import text
 from sqlalchemy.orm import Session
-
-from ..sql import sql_deck_lb, sql_user_lb
+from ..db.queries.leaderboards import deck_leaderboard_overall, user_leaderboard_overall
 
 class LBDeckEmbed(discord.Embed):
 
@@ -11,7 +8,7 @@ class LBDeckEmbed(discord.Embed):
         super(LBDeckEmbed, self).__init__(title=title)
 
         with Session(db_engine) as session:
-            res = session.execute(text(sql_deck_lb))
+            res = session.execute(deck_leaderboard_overall())
             decks = res.fetchall()
 
         for (deck_id, color, desc, comm, wins, plays) in decks:
@@ -29,7 +26,7 @@ class LBUserEmbed(discord.Embed):
         super(LBUserEmbed, self).__init__(title=title)
 
         with Session(db_engine) as session:
-            res = session.execute(text(sql_user_lb))
+            res = session.execute(user_leaderboard_overall())
             user_records = res.fetchall()
 
         for (user, wins, played) in user_records:

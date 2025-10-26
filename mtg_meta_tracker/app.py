@@ -10,8 +10,8 @@ import time
 
 from .sql import sql_insert_card_to_deck
 from .util import parse_scryfalljson
-from .models import card_table
-
+# from .models import card_table
+from .db.models import card_table
 
 class MTTClient(discord.Client):
     def __init__(self, db_engine, bot_channel_id) -> None:

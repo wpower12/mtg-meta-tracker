@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from ..embeds import GameRecordEmbed
 from ..sql import sql_get_players, sql_get_decks, sql_try_insert_player, sql_insert_game_played
-from ..models import game_table
+from ..db.models import game_table
 
 
 class AddPlayerMsg(discord.ui.View):

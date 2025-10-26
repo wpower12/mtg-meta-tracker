@@ -6,7 +6,9 @@ from sqlalchemy.orm import Session
 
 from table2ascii import table2ascii as t2a, PresetStyle
 
-from ..sql import sql_get_deck, sql_get_deck_cards, sql_get_wins
+from ..sql import sql_get_deck_cards
+
+from ..db.queries.deck import get_deck_wins, get_deck
 from ..util import colors_to_str_rep
 
 class DeckSummaryEmbed(discord.Embed):
@@ -15,15 +17,16 @@ class DeckSummaryEmbed(discord.Embed):
         super(DeckSummaryEmbed, self).__init__(title=title)
 
         found_deck = False
+        wins = None
         with Session(db_engine) as session:
             try:
-                res = session.execute(text(sql_get_deck), {'iddeck': deck_id})
+                res = session.execute(get_deck(deck_id))
                 deck_meta = res.fetchone()
 
                 if deck_meta is not None:
                     found_deck = True
                     comm, color_identity, desc = deck_meta
-                    win_res = session.execute(text(sql_get_wins), {'iddeck': deck_id})
+                    win_res = session.execute(get_deck_wins(deck_id))
                     wins = win_res.fetchone()
 
             except Exception as e:
@@ -31,7 +34,7 @@ class DeckSummaryEmbed(discord.Embed):
                 print(f"error: {e}")
 
         if found_deck:
-            wins = 0 if wins is None else wins[0]
+            wins = 0 if wins is None else wins[1]
             win_str = "win" if wins == 1 else "wins"
 
             color_str = colors_to_str_rep(color_identity, emojis)

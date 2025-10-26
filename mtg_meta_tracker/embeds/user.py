@@ -1,12 +1,8 @@
 import discord
-import scrython
 
-from sqlalchemy import text
 from sqlalchemy.orm import Session
 
-from table2ascii import table2ascii as t2a, PresetStyle
-
-from ..sql import sql_get_user_summary, sql_get_user_deck_summary
+from ..db.queries.player import player_summary, player_deck_summary
 
 class UserStats(discord.Embed):
 
@@ -14,9 +10,9 @@ class UserStats(discord.Embed):
         super(UserStats, self).__init__(title=f"{user_id} Summary")
 
         with Session(db_engine) as session:
-            res = session.execute(text(sql_get_user_summary), {'idplayer': user_id})
+            res = session.execute(player_summary(user_id))
             user_stats = res.fetchall()
-            res = session.execute(text(sql_get_user_deck_summary), {'idplayer': user_id})
+            res = session.execute(player_deck_summary(user_id))
             deck_stats = res.fetchall()
 
         if len(user_stats) > 0:

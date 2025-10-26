@@ -2,7 +2,7 @@ import discord
 from sqlalchemy import text, insert
 from sqlalchemy.orm import Session
 from ..sql import sql_try_insert_player, sql_insert_game_played
-from ..models import Game, game_table
+from ..db.models import Game, game_table
 
 class AddGame(discord.ui.Modal, title='Add Game'):
     date = discord.ui.TextInput(
