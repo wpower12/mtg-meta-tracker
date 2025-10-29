@@ -1,11 +1,10 @@
 import discord
 
-from sqlalchemy import insert, text
+from sqlalchemy import insert, text, select
 from sqlalchemy.orm import Session
 
 from ..embeds import GameRecordEmbed
-from ..sql import sql_get_players, sql_get_decks, sql_try_insert_player, sql_insert_game_played
-from ..db.models import game_table
+from ..db.models import game_table, player_table, deck_table, games_played_table
 
 
 class AddPlayerMsg(discord.ui.View):
@@ -15,9 +14,9 @@ class AddPlayerMsg(discord.ui.View):
         self.ag_msg = addgame_msg
 
         with Session(db_engine) as session:
-            res = session.execute(text(sql_get_players))
+            res = session.execute(select(player_table))
             players = res.fetchall()
-            res = session.execute(text(sql_get_decks))
+            res = session.execute(select(deck_table))
             decks = res.fetchall()
 
         player_options = [discord.SelectOption(label=f"{p[0]}") for p in players]
@@ -54,6 +53,8 @@ class AddPlayerMsg(discord.ui.View):
         await interaction.delete_original_response()
 
 class DynButton(discord.ui.Button):
+    parent = None
+
     def __init__(self, label, n, parent_msg, *args, **kwargs):
         super(DynButton, self).__init__(label=label, *args, **kwargs)
         self.style = discord.ButtonStyle.green
@@ -105,17 +106,18 @@ class AddGameMsg(discord.ui.View):
 
         with Session(self.db) as session, session.begin():
             stmt = insert(game_table)
+
             res = session.execute(stmt, {'date': self.date, 'notes': self.notes})
             g_id = res.inserted_primary_key[0]
             for i, [p, d] in enumerate(self.player_data):
                 win = 1 if i == 0 else 0
 
-                session.execute(text(sql_try_insert_player), {'idplayer': p})
-                session.execute(text(sql_insert_game_played), {
+                # session.execute(insert(player_table), {'idplayer': p})
+                session.execute(insert(games_played_table), {
                     'idgame': g_id,
                     'idplayer': p,
                     'iddeck': d,
-                    'winner': win
+                    'finish': i+1
                 })
 
         gr_embed = GameRecordEmbed(self.player_data, self.date, self.notes)

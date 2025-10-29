@@ -15,12 +15,6 @@ def get_deck(deck_id):
                   Deck.desc) \
         .where(Deck.iddeck == deck_id)
 
-sql_get_deck_cards = """
-SELECT count, card.name, card.mana_cost, card.typeline, card.scryfall_uri FROM cards
-JOIN card on card.oracle_id=cards.oracle_id
-WHERE cards.iddeck=:iddeck
-order by card.typeline, card.name asc;
-"""
 
 def get_deck_cards(deck_id):
     return select(CardInDeck.count,

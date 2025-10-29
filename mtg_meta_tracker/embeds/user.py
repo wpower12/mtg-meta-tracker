@@ -2,7 +2,7 @@ import discord
 
 from sqlalchemy.orm import Session
 
-from ..db.queries.player import player_summary, player_deck_summary
+from ..db.queries.player import player_win_summary, player_deck_summary
 
 class UserStats(discord.Embed):
 
@@ -10,7 +10,7 @@ class UserStats(discord.Embed):
         super(UserStats, self).__init__(title=f"{user_id} Summary")
 
         with Session(db_engine) as session:
-            res = session.execute(player_summary(user_id))
+            res = session.execute(player_win_summary(user_id))
             user_stats = res.fetchall()
             res = session.execute(player_deck_summary(user_id))
             deck_stats = res.fetchall()

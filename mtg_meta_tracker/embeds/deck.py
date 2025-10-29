@@ -1,14 +1,10 @@
 import discord
 import scrython
 
-from sqlalchemy import text
 from sqlalchemy.orm import Session
-
 from table2ascii import table2ascii as t2a, PresetStyle
 
-from ..sql import sql_get_deck_cards
-
-from ..db.queries.deck import get_deck_wins, get_deck
+from ..db.queries.deck import get_deck_wins, get_deck, get_deck_cards
 from ..util import colors_to_str_rep
 
 class DeckSummaryEmbed(discord.Embed):
@@ -65,7 +61,7 @@ def generate_card_list_embeds(db_engine, emojis, deck_id):
     card_table_data = []
     with Session(db_engine) as session:
         try:
-            res = session.execute(text(sql_get_deck_cards), {'iddeck': deck_id})
+            res = session.execute(get_deck_cards(deck_id))
             for card in res.fetchall():
                 count, name, mana_cost, type_line, sf_uri = card
                 card_table_data.append(

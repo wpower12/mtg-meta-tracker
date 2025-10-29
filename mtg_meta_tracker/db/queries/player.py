@@ -2,7 +2,7 @@ from sqlalchemy import func, select, desc
 from ..models import Deck, Game, GamePlayed, Player
 
 
-def player_summary(player_id):
+def player_win_summary(player_id):
     return select(func.count(func.IF(GamePlayed.finish == 1, 1, None)).label("wins"),
                   func.count().label("plays")) \
         .select_from(Player) \

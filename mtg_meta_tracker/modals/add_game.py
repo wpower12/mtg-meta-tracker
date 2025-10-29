@@ -1,8 +1,8 @@
 import discord
-from sqlalchemy import text, insert
+from sqlalchemy import insert
 from sqlalchemy.orm import Session
-from ..sql import sql_try_insert_player, sql_insert_game_played
-from ..db.models import Game, game_table
+
+from ..db.models import game_table, player_table, games_played_table
 
 class AddGame(discord.ui.Modal, title='Add Game'):
     date = discord.ui.TextInput(
@@ -48,12 +48,12 @@ class AddGame(discord.ui.Modal, title='Add Game'):
                     win = 1 if i == 0 else 0
                     print(p, d, win)
 
-                    session.execute(text(sql_try_insert_player), {'idplayer': p})
-                    session.execute(text(sql_insert_game_played), {
+                    session.execute(insert(player_table), {'idplayer': p})
+                    session.execute(insert(games_played_table), {
                         'idgame': g_id,
                         'idplayer': p,
                         'iddeck': d,
-                        'winner': win
+                        'finish': i+1
                     })
 
         await interaction.response.send_message(f'Added game record', ephemeral=True)
