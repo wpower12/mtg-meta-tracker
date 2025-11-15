@@ -1,3 +1,16 @@
+# Proposed Changes Overview
+* Add leagues
+  * Things with formats, players, points tracked seperatly, games tracked separtely etc.
+  * Commands for adding them, adding players to them, adding game records to them.
+* Format-awareness
+  * Currently assumes commander, want to have each league and deck track a Format.
+* Permissions
+  * Add control over who can modify what, and the ability to grant those permissions.
+* Player admin
+  * Commands to add Discord players to the tracker
+* Updated Leaderboards
+  * For all leagues
+
 # Leagues
 ### Structure
 A league has:
